@@ -20,15 +20,59 @@ const { NotImplementedError } = require('../lib');
  *
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    // Remove line below and write your code here
-    throw new NotImplementedError('Not implemented');
-  }
+    constructor(direct = true) {
+        this.direct = direct;
+    }
 
-  decrypt() {
-    // Remove line below and write your code here
-    throw new NotImplementedError('Not implemented');
-  }
+    encrypt(message, key) {
+        if (!message || !key) {
+            throw new Error('Incorrect arguments!');
+        }
+        return this.processText(message, key, true);
+    }
+
+    decrypt(encryptedMessage, key) {
+        if (!encryptedMessage || !key) {
+            throw new Error('Incorrect arguments!');
+        }
+        return this.processText(encryptedMessage, key, false);
+    }
+
+    processText(text, key, isEncrypt) {
+        text = text.toUpperCase();
+        key = key.toUpperCase();
+        
+        let result = [];
+        let keyIndex = 0;
+        
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            
+            if (char >= 'A' && char <= 'Z') {
+                const textCode = char.charCodeAt(0) - 65;
+                const keyCode = key[keyIndex % key.length].charCodeAt(0) - 65;
+                
+                let processedCode;
+                if (isEncrypt) {
+                    processedCode = (textCode + keyCode) % 26;
+                } else {
+                    processedCode = (textCode - keyCode + 26) % 26;
+                }
+                
+                result.push(String.fromCharCode(processedCode + 65));
+                keyIndex++;
+            } else {
+                result.push(char);
+            }
+        }
+        
+        // Reverse if this is a reverse machine
+        if (!this.direct) {
+            result.reverse();
+        }
+        
+        return result.join('');
+    }
 }
 
 module.exports = {
